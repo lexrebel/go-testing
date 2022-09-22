@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -10,20 +11,20 @@ import (
 
 func main() {
 	intro()
-	c := make(chan bool)
-	go readUserImput(c)
-	<-c
-	close(c)
+	doneChan := make(chan bool)
+	go readUserImput(os.Stdin, doneChan)
+	<-doneChan
+	close(doneChan)
 	fmt.Println("Até logo.")
 }
 
-func readUserImput(c chan bool) {
-	scanner := bufio.NewScanner(os.Stdin)
+func readUserImput(in io.Reader, doneChan chan bool) {
+	scanner := bufio.NewScanner(in)
 
 	for {
 		res, done := checkNumbers(scanner)
 		if done {
-			c <- true
+			doneChan <- true
 			return
 		}
 		fmt.Println(res)
