@@ -1,0 +1,30 @@
+version: '3.1'
+
+x-common-variables: &common-variables
+  POSTGRES_DB: pgdb
+  POSTGRES_USER: pguser
+  POSTGRES_PASSWORD: pgpass
+
+services:
+
+  pg:
+    image: postgres
+    container_name: postgres 
+    restart: always
+    environment:
+      <<: *common-variables      
+    ports:
+      - "5432:5432"
+  
+  pg-flyway:
+    image: flyway/flyway:latest-alpine
+    container_name: pg-flyway
+    environment:
+      <<: *common-variables      
+    depends_on:
+      - pg
+    volumes:
+      - ${PWD}/flyway/sql:/flyway/sql
+      - ${PWD}/flyway/conf:/flyway/conf
+    command: migrate
+ 
